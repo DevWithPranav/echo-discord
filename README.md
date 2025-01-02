@@ -57,7 +57,10 @@ npx echo-discord
 
 2. Configure your bot token and other settings in `.env` file:
 ```env
-DISCORD_TOKEN=your_bot_token_here
+BOT_TOKEN=Enter-your-bot-Token
+DISCORD_ID=Enter-your-bot-id
+BOT_ERROR_LOG_CHANNEL=Enter-the-log-channel
+NODE_ENV=
 ```
 
 3. Start developing your commands in the `commands` directory
