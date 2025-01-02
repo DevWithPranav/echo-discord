@@ -39,7 +39,7 @@ Whether you're building your first Discord bot or looking for a solid foundation
    `npm (v8 or latest)`
    
 1. Installation 
-    Follow these steps to set up the bot 
+   Follow these steps to set up the bot 
 
     - Run the following command:
      `npx echo-discord`
