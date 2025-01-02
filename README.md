@@ -38,14 +38,14 @@ discord-bot-package-v1/
 │   │   │   ├── interactionCreate.js
 │   │   │   └── ready.js
 │   └── handlers/
-│       ├── loaders/
-│       │   ├── deployCommands.js
-│       │   ├── loadCommands.js
-│       │   ├── loadComponents.js
-│       │   └── loadEvents.js
-│       ├── index.js
-│       ├── logger.js
-│       └── shared.js
+│   │   ├── loaders/
+│   │       ├── deployCommands.js
+│   │       ├── loadCommands.js
+│   │       ├── loadComponents.js
+│   │       └── loadEvents.js
+│   ├── index.js
+│   ├── logger.js
+│   └── shared.js
 ```
 
 ## Getting Started
