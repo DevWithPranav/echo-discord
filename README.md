@@ -33,12 +33,15 @@ Whether you're building your first Discord bot or looking for a solid foundation
 	5. LICENCE 
 
 #### **Getting started**
+
 1. Prerequisites 
+
    Before getting started, ensure your system has the following installed:
    `Node.js (v18 or latest)`
    `npm (v8 or latest)`
    
 1. Installation 
+
    Follow these steps to set up the bot 
 
     - Run the following command:
