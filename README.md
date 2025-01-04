@@ -4,7 +4,7 @@ A highly featured, advanced Discord bot framework that simplifies bot developmen
 
 ## Features
 
-- 🚀 Easy setup with `npx echo-discord`
+- 🚀 Easy setup with `npx echo-discord-template`
 - 📂 Modular command handling system
 - 🔄 Event-driven architecture
 - 🛠️ Built-in component management
@@ -15,7 +15,7 @@ A highly featured, advanced Discord bot framework that simplifies bot developmen
 ## Installation
 
 ```bash
-npx echo-discord
+npx echo-discord-template
 ```
 
 This will set up all the necessary files and structure for your Discord bot project.
@@ -52,7 +52,7 @@ discord-bot-package-v1/
 
 1. Install the package using npx:
 ```bash
-npx echo-discord
+npx echo-discord-template
 ```
 
 2. Configure your bot token and other settings in `.env` file:
