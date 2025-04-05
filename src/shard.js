@@ -2,84 +2,98 @@ import { ShardingManager } from "discord.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import colors from "colors";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-// Helper functions
-const logSystem = (message, color = "cyan") =>
-  console.log("System".cyan, ">>".blue, message[color]);
-
-const logError = (message) =>
-  console.error("System".cyan, ">>".blue, message.red);
-
-// Resolve paths for ES Modules
+// === Constants & Setup ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Validate environment variables
-if (!process.env.BOT_TOKEN) {
-  logError("BOT_TOKEN is not defined in the .env file");
-  process.exit(1); // Exit if no token is provided
-}
-
-// Initialize ShardingManager
-const manager = new ShardingManager(path.join(__dirname, "bot.js"), {
-  totalShards: "auto", // Automatically calculate the number of shards
-  token: process.env.BOT_TOKEN, // Securely load token
-  respawn: true, // Automatically respawn shards on exit
-  silent: false, // Display shard output in the console
-});
-
 console.clear();
 
-// Handle Shard Events
+// === Logging Helpers ===
+const emoji = {
+  startup: "🚀",
+  ready: "✅",
+  error: "❌",
+  warning: "⚠️",
+  reconnect: "🔄",
+  shard: "🧩",
+};
+
+const logSystem = (message, color = "cyan") =>
+  console.log(`${emoji.shard} System`.cyan, ">>".blue, message[color]);
+
+const logError = (message) =>
+  console.error(`${emoji.error} System`.cyan, ">>".blue, message.red);
+
+// === Env Validation ===
+if (!process.env.BOT_TOKEN) {
+  logError("BOT_TOKEN is not defined in the .env file.");
+  process.exit(1);
+}
+
+// === Initialize Sharding Manager ===
+const manager = new ShardingManager(path.join(__dirname, "bot.js"), {
+  totalShards: "auto",
+  token: process.env.BOT_TOKEN,
+  respawn: true,
+  silent: false,
+});
+
+logSystem(`${emoji.startup} Launching Shards...`, "green");
+
+// === Shard Lifecycle Events ===
 manager.on("shardCreate", (shard) => {
-  logSystem(`Starting Shard #${shard.id}...`, "green");
+  logSystem(`🆕 Starting Shard #${shard.id}`, "yellow");
 
   shard.on("death", (process) => {
-    logError(
-      `Shard #${shard.id} died with exit code ${process.exitCode}. Restarting...`
-    );
+    logError(`💀 Shard #${shard.id} died (code ${process.exitCode}). Restarting...`);
   });
 
   shard.on("disconnect", (event) => {
-    logError(`Shard #${shard.id} disconnected. Socket close event:`);
-    console.log(event);
+    logError(`🔌 Shard #${shard.id} disconnected. Close event:`);
+    console.error(event);
   });
 
   shard.on("reconnecting", () => {
-    logSystem(`Shard #${shard.id} is reconnecting...`, "yellow");
+    logSystem(`🔁 Shard #${shard.id} reconnecting...`, "cyan");
   });
 
   shard.on("ready", () => {
-    logSystem(`Shard #${shard.id} is ready!`, "green");
+    logSystem(`✅ Shard #${shard.id} is ready!`, "green");
   });
 
   shard.on("resume", () => {
-    logSystem(`Shard #${shard.id} has resumed successfully.`, "green");
+    logSystem(`🔄 Shard #${shard.id} resumed successfully.`, "green");
   });
 
-  shard.on("message", (message) => {
-    logSystem(`Message received from Shard #${shard.id}: ${message}`, "grey");
+  shard.on("message", (msg) => {
+    logSystem(`📩 Shard #${shard.id} message: ${msg}`, "grey");
   });
 });
 
-// Spawn Shards
+// === Spawn the Shards ===
 manager
   .spawn()
-  .then(() => logSystem("All shards spawned successfully!", "green"))
-  .catch((error) => {
-    logError("Error spawning shards:");
-    console.error(error);
+  .then(() => logSystem("🎉 All shards spawned successfully!", "green"))
+  .catch((err) => {
+    logError("Failed to spawn shards:");
+    console.error(err);
     process.exit(1);
   });
 
-// Global Error Handling
-process.on("unhandledRejection", (error) => {
-  logError("Unhandled Promise Rejection:");
+// === Global Error Handling ===
+process.on("unhandledRejection", (reason) => {
+  logError("UNHANDLED REJECTION:");
+  console.error(reason);
+});
+
+process.on("uncaughtException", (error) => {
+  logError("UNCAUGHT EXCEPTION:");
   console.error(error);
+  process.exit(1);
 });
 
 process.on("warning", (warn) => {
-  logSystem(`Warning: ${warn.message}`, "yellow");
+  logSystem(`${emoji.warning} Node Warning: ${warn.message}`, "yellow");
 });

@@ -2,121 +2,86 @@ import { Events, PermissionsBitField } from 'discord.js';
 import errorHandler from './errCreate.js';
 
 export default {
-    name: Events.InteractionCreate,
-    async execute(interaction, client) {
-        try {
-            if (interaction.isChatInputCommand()) {
-                await handleCommand(interaction, client);
-            } else if (interaction.isButton()) {
-                await handleButton(interaction, client);
-            } else if (interaction.isAnySelectMenu()) {
-                await handleSelectMenu(interaction, client);
-            } else if (interaction.isModalSubmit()) {
-                await handleModalSubmit(interaction, client);
-            }
-        } catch (error) {
-            console.error('Error handling interaction:', error);
-            const commandOrCustomId = interaction.commandName || interaction.customId || 'Unknown';
-            await errorHandler.execute(client, error, commandOrCustomId, interaction);
-        }
+  name: Events.InteractionCreate,
+  async execute(interaction, client) {
+    try {
+      if (interaction.isChatInputCommand()) {
+        await handleCommand(interaction, client);
+      } else if (interaction.isButton()) {
+        await handleComponent(interaction, client, "button");
+      } else if (interaction.isAnySelectMenu()) {
+        await handleComponent(interaction, client, "select menu");
+      } else if (interaction.isModalSubmit()) {
+        await handleComponent(interaction, client, "modal");
+      }
+    } catch (error) {
+      console.error("❌ Error handling interaction:", error);
+      const id = interaction.commandName || interaction.customId || "Unknown";
+      await errorHandler.execute(client, error, id, interaction);
     }
+  }
 };
 
 async function handleCommand(interaction, client) {
-    const command = client.commands.get(interaction.commandName);
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        await sendErrorReply(interaction, `Command \`${interaction.commandName}\` not found.`);
-        return;
-    }
+  const command = client.commands.get(interaction.commandName);
 
-    // Check required permissions
-    const missingPermissions = checkPermissions(interaction, command.requiredPermissions || []);
-    if (missingPermissions.length > 0) {
-        await sendErrorReply(
-            interaction,
-            `I am missing the following permissions to execute this command: ${missingPermissions.join(', ')}`
-        );
-        return;
-    }
+  if (!command) {
+    console.warn(`⚠️ Command "${interaction.commandName}" not found.`);
+    return await sendErrorReply(interaction, `🚫 Command \`${interaction.commandName}\` not found.`);
+  }
 
-    // Execute the command
-    try {
-        await command.execute(client, interaction);
-    } catch (error) {
-        console.error(`Error executing command "${interaction.commandName}":`, error);
-        throw error; // Pass error to global handler
-    }
+  const missing = checkPermissions(interaction, command.requiredPermissions || []);
+  if (missing.length > 0) {
+    return await sendErrorReply(
+      interaction,
+      `❗ Missing permissions: \`${missing.join(', ')}\`.`
+    );
+  }
+
+  try {
+    await command.execute(client, interaction);
+  } catch (err) {
+    console.error(`🔥 Error in command "${interaction.commandName}":`, err);
+    throw err;
+  }
 }
 
-async function handleButton(interaction, client) {
-    const button = client.components.get(interaction.customId);
-    if (!button) {
-        console.error(`No button component matching ${interaction.customId} was found.`);
-        await sendErrorReply(interaction, `Button \`${interaction.customId}\` not found.`);
-        return;
-    }
+async function handleComponent(interaction, client, type) {
+  const handler = client.components.get(interaction.customId);
 
-    try {
-        await button.execute(interaction);
-    } catch (error) {
-        console.error(`Error executing button "${interaction.customId}":`, error);
-        throw error; // Pass error to global handler
-    }
-}
+  if (!handler) {
+    console.warn(`⚠️ ${type} "${interaction.customId}" not found.`);
+    return await sendErrorReply(interaction, `🔍 ${type} \`${interaction.customId}\` not found.`);
+  }
 
-async function handleSelectMenu(interaction, client) {
-    const selectMenu = client.components.get(interaction.customId);
-    if (!selectMenu) {
-        console.error(`No select menu component matching ${interaction.customId} was found.`);
-        await sendErrorReply(interaction, `Select menu \`${interaction.customId}\` not found.`);
-        return;
-    }
-
-    try {
-        await selectMenu.execute(interaction);
-    } catch (error) {
-        console.error(`Error executing select menu "${interaction.customId}":`, error);
-        throw error; // Pass error to global handler
-    }
-}
-
-async function handleModalSubmit(interaction, client) {
-    const modal = client.components.get(interaction.customId);
-    if (!modal) {
-        console.error(`No modal component matching ${interaction.customId} was found.`);
-        await sendErrorReply(interaction, `Modal \`${interaction.customId}\` not found.`);
-        return;
-    }
-
-    try {
-        await modal.execute(interaction);
-    } catch (error) {
-        console.error(`Error executing modal "${interaction.customId}":`, error);
-        throw error; // Pass error to global handler
-    }
+  try {
+    await handler.execute(interaction);
+  } catch (err) {
+    console.error(`🔥 Error in ${type} "${interaction.customId}":`, err);
+    throw err;
+  }
 }
 
 function checkPermissions(interaction, requiredPermissions) {
-    const botMember = interaction.guild?.members?.me;
-    if (!botMember) {
-        console.error('Bot member object is not available in the guild.');
-        return [];
-    }
+  const bot = interaction.guild?.members?.me;
+  if (!bot) {
+    console.warn("⚠️ Could not fetch bot member from guild.");
+    return [];
+  }
 
-    return requiredPermissions.filter(
-        perm => !botMember.permissions.has(PermissionsBitField.Flags[perm])
-    );
+  return requiredPermissions.filter(perm => 
+    !bot.permissions.has(PermissionsBitField.Flags[perm])
+  );
 }
 
-async function sendErrorReply(interaction, message) {
-    try {
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: message, ephemeral: true });
-        } else {
-            await interaction.reply({ content: message, ephemeral: true });
-        }
-    } catch (error) {
-        console.error('Failed to send an error reply:', error);
+async function sendErrorReply(interaction, content) {
+  try {
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({ content, ephemeral: true });
+    } else {
+      await interaction.reply({ content, ephemeral: true });
     }
+  } catch (err) {
+    console.error("⚠️ Failed to reply with error message:", err);
+  }
 }

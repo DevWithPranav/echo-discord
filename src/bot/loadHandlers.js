@@ -8,37 +8,47 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const loadHandlers = async () => {
-    console.log('System'.cyan, '>>'.blue, 'Loading Handlers...'.green);
-    const foldersPath = path.join(__dirname, '..', 'handlers');
+  console.log('System'.cyan, '>>'.blue, 'Loading Handlers...'.green);
 
-    if (!fs.existsSync(foldersPath)) {
-        throw new Error(`Handlers folder not found at: ${foldersPath}`);
+  const handlersRootPath = path.join(__dirname, '..', 'handlers');
+
+  if (!fs.existsSync(handlersRootPath)) {
+    console.warn(
+      'System'.cyan,
+      '>>'.blue,
+      '⚠️ [WARNING]'.yellow,
+      `Handlers folder not found at: ${handlersRootPath}`.yellow
+    );
+    return;
+  }
+
+  const handlerFolders = fs.readdirSync(handlersRootPath);
+
+  for (const folder of handlerFolders) {
+    const handlerFolderPath = path.join(handlersRootPath, folder);
+
+    if (!fs.existsSync(handlerFolderPath) || !fs.lstatSync(handlerFolderPath).isDirectory()) {
+      continue;
     }
 
-    const handlersFolders = fs.readdirSync(foldersPath);
+    const handlerFiles = fs
+      .readdirSync(handlerFolderPath)
+      .filter(file => file.endsWith('.js'));
 
-    for (const folder of handlersFolders) {
-        const handlersPath = path.join(foldersPath, folder);
-        
-        if (!fs.lstatSync(handlersPath).isDirectory()) {
-            continue;
-        }
+    for (const file of handlerFiles) {
+      const fullFilePath = path.join(handlerFolderPath, file);
 
-        const handlersFiles = fs.readdirSync(handlersPath).filter(file => file.endsWith('.js'));
-
-        for (const file of handlersFiles) {
-            const filePath = path.join(handlersPath, file);
-            try {
-                await import(pathToFileURL(filePath).toString());
-                console.log('System'.cyan, '>>'.blue, `Loaded handler: ${file}`.green);
-            } catch (err) {
-                logger.error(`Failed to load handler at ${filePath}: ${err.message}`);
-            }
-        }
+      try {
+        await import(pathToFileURL(fullFilePath).href);
+        console.log('System'.cyan, '>>'.blue, `Loaded handler: ${folder}/${file}`.green);
+      } catch (err) {
+        logger.error(`Failed to load handler at ${fullFilePath}: ${err.stack || err.message}`);
+      }
     }
-    
-    console.log('System'.cyan, '>>'.blue, 'Handlers Loaded'.green);
-    console.log('\u001b[0m');
+  }
+
+  console.log('System'.cyan, '>>'.blue, 'Handlers Loaded'.green);
+  console.log('\u001b[0m');
 };
 
 export default loadHandlers;
