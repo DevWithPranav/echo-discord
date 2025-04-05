@@ -1,6 +1,6 @@
 {
   "name": "echo-discord",
-  "version": "1.2.2",
+  "version": "2.1.1",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

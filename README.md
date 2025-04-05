@@ -1,109 +1,177 @@
-# Discord Bot Package
 
-A highly featured, advanced Discord bot framework that simplifies bot development with a modular and extensible architecture.
+# ⚙️ Discord Bot Framework - Advanced Template
 
-## Features
+A modular, scalable, and developer-friendly **Discord bot framework** built with modern `discord.js`, focused on maintainability, performance, and flexibility.
 
-- 🚀 Easy setup with `npx echo-discord-template`
-- 📂 Modular command handling system
-- 🔄 Event-driven architecture
-- 🛠️ Built-in component management
-- ⚡ Efficient command and event loading
-- 🔌 Plugin support through handlers
-- 📝 Extensive logging capabilities
+---
 
-## Installation
+## 🌟 Features
 
-```bash
-npx echo-discord-template
-```
+- 🧠 **Modular Architecture** – Cleanly separated commands, events, components, and utilities.
+- 🧩 **Auto Handler Loader** – Dynamically loads commands, components, and event files.
+- 🔄 **Event-driven System** – Easily attach lifecycle and user events via simple files.
+- 📦 **Environment-Based Configuration** – Configure status text, token, and logging behavior via `.env`.
+- 🧪 **Built-in Error Handler** – Centralized error catching with support for custom logging.
+- 💡 **Easy Extensibility** – Add more handlers or plugin support with minimal changes.
+- 📄 **Detailed Logs** – Logs written to both the console and structured files under `/logs`.
 
-This will set up all the necessary files and structure for your Discord bot project.
+---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-discord-bot-package-v1/
+discord-bot/
+├── logs/                          # All log files (auto-generated)
+├── node_modules/
 ├── src/
-│   ├── bot/
-│   │   ├── botClientOptions.js
-│   │   └── loadHandlers.js
+│   ├── bot/                       # Bot startup logic
+│   │   ├── botClientOptions.js    # Discord client configuration
+│   │   └── loadHandlers.js        # Loads all handler modules
 │   ├── commands/
-│   │   └── ping.js
-│   ├── components/
-│   ├── config/
+│   │   └── util/
+│   │       └── ping.js            # Example ping command
+│   ├── components/               # Button, modal, and select menu logic
 │   ├── events/
-│   │   ├── client/
-│   │   │   ├── onCreate.js
-│   │   │   ├── interactionCreate.js
-│   │   │   └── ready.js
-│   └── handlers/
-│   │   ├── loaders/
-│   │       ├── deployCommands.js
-│   │       ├── loadCommands.js
-│   │       ├── loadComponents.js
-│   │       └── loadEvents.js
-│   ├── index.js
-│   ├── logger.js
-│   └── shared.js
+│   │   └── client/
+│   │       ├── errCreate.js       # Error handler
+│   │       ├── interactionCreate.js  # Handles interactions (commands, buttons, modals)
+│   │       └── ready.js           # Bot ready event
+│   ├── handlers/
+│   │   └── loaders/
+│   │       ├── deployCommands.js  # Slash command deployer
+│   │       ├── loadCommands.js    # Command loader
+│   │       ├── loadComponents.js  # Component loader
+│   │       └── loadEvents.js      # Event loader
+│   ├── logger.js                  # Logging helper
+│   ├── shard.js                   # Sharding support
+│   └── bot.js                     # Client export
+├── .env                           # Environment variables
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── README.md                      # This file
 ```
 
-## Getting Started
+---
 
-1. Install the package using npx:
+## 🚀 Getting Started
+
+### 1. 📦 Install the Template
+
 ```bash
 npx echo-discord-template
+cd discord-bot
+npm install
 ```
 
-2. Configure your bot token and other settings in `.env` file:
+### 2. 🔑 Configure Your `.env`
+
 ```env
-BOT_TOKEN=Enter-your-bot-Token
-DISCORD_ID=Enter-your-bot-id
-BOT_ERROR_LOG_CHANNEL=Enter-the-log-channel
-NODE_ENV=
+BOT_TOKEN=your-discord-token
+DISCORD_ID=your-discord-app-id
+BOT_ERROR_LOG_CHANNEL=log-channel-id
+DISCORD_STATUS=🔧 Maintenance,⚡ Online,📚 Learning
+STATUS_UPDATE_INTERVAL=3600000 # in ms (1 hour default)
+NODE_ENV=development
 ```
 
-3. Start developing your commands in the `commands` directory
-4. Add custom events in the `events` directory
-5. Run your bot:
+### 3. 💬 Add Commands
+
+Create your commands in `src/commands/` using the `SlashCommandBuilder`:
+
+```js
+// src/commands/util/ping.js
+import { SlashCommandBuilder } from 'discord.js';
+
+export default {
+    data: new SlashCommandBuilder().setName('ping').setDescription('Replies with Pong!'),
+    async execute(client, interaction) {
+        await interaction.reply({ content: 'Pong!', ephemeral: true });
+    },
+};
+```
+
+---
+
+## ▶️ Run Your Bot
+
 ```bash
 npm start
 ```
 
-## Contributing
-
-We welcome contributions! If you'd like to contribute:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## Issues and Bug Reports
-
-Found a bug or have a suggestion? Please open an issue on GitHub with:
-- A clear description of the problem
-- Steps to reproduce
-- Expected behavior
-- Screenshots (if applicable)
-
-## License
-
-This project is open-source and available under the MIT License. See the LICENSE file for more details.
-
-## Support
-
-Need help? You can:
-- Open an issue on GitHub
-- Join our Discord community (coming soon)
-- Check out the documentation (coming soon)
-
-## Acknowledgments
-
-- Thanks to all contributors who help make this project better
-- Discord.js community for their excellent documentation
-- All users who provide valuable feedback
+Behind the scenes, this will:
+- Create a configured Discord client from `botClientOptions.js`
+- Dynamically load all commands, events, and components via `loadHandlers.js`
+- Register slash commands with Discord (via `deployCommands.js`)
+- Log meaningful startup info and status changes
 
 ---
-Made with ❤️ by the Discord Bot Package community
+
+## 🔄 Handlers
+
+Handlers are responsible for dynamically loading specific aspects of your bot:
+
+| Handler              | Description                                 |
+|----------------------|---------------------------------------------|
+| `loadCommands.js`    | Loads all slash commands into memory        |
+| `loadEvents.js`      | Loads all event listeners (`Events.Client`) |
+| `loadComponents.js`  | Loads all buttons, modals, and selects      |
+| `deployCommands.js`  | Registers slash commands with Discord API   |
+
+---
+
+## 🧪 Error Logging
+
+Errors during command or component execution are captured by `errCreate.js` and logged both to console and optionally to a Discord channel defined in `.env`:
+
+```env
+BOT_ERROR_LOG_CHANNEL=your-channel-id
+```
+
+---
+
+## 🛠 Tips for Development
+
+- Use `console.log()` during early development. Switch to structured logging in production using `logger.js`.
+- Commands can use `.deferReply()` and `.followUp()` for long operations.
+- Components (buttons, selects, modals) are dynamically matched by their `customId`.
+
+---
+
+## 🧩 Contributing
+
+1. Fork the repo  
+2. Create your branch: `git checkout -b feature/AmazingFeature`  
+3. Commit: `git commit -m 'Add AmazingFeature'`  
+4. Push: `git push origin feature/AmazingFeature`  
+5. Open a Pull Request
+
+---
+
+## 🐛 Issues & Suggestions
+
+Found a bug or have a feature request?  
+Open an issue and include:
+- 🔍 Clear description
+- 🧪 Steps to reproduce
+- 💥 Expected behavior vs actual
+- 🖼 Screenshots if applicable
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.  
+See the `LICENSE` file for details.
+
+---
+
+## 💬 Support
+
+- [x] GitHub Issues (for bug reports & suggestions)
+- [ ] Discord Community – coming soon
+- [ ] Docs site – coming soon
+
+---
+
+Made with ❤️ by the Discord Bot Package community.
