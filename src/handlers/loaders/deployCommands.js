@@ -11,7 +11,7 @@ const emoji = {
   refresh: "🔄",
   success: "✅",
   error: "❌",
-  system: "🛠️",
+  system: "🧩",
 };
 
 const logSystem = (msg, color = "cyan") =>

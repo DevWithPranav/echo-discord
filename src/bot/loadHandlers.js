@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const loadHandlers = async () => {
-  console.log('System'.cyan, '>>'.blue, 'Loading Handlers...'.green);
+  console.log('🧩 System'.cyan, '>>'.blue, 'Loading Handlers...'.green);
 
   const handlersRootPath = path.join(__dirname, '..', 'handlers');
 
@@ -40,7 +40,7 @@ const loadHandlers = async () => {
 
       try {
         await import(pathToFileURL(fullFilePath).href);
-        console.log('System'.cyan, '>>'.blue, `Loaded handler: ${folder}/${file}`.green);
+        console.log('🧩 System'.cyan, '>>'.blue, `Loaded handler: ${folder}/${file}`.green);
       } catch (err) {
         logger.error(`Failed to load handler at ${fullFilePath}: ${err.stack || err.message}`);
       }

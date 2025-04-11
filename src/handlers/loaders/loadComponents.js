@@ -14,7 +14,7 @@ const emoji = {
   success: "✅",
   warn: "⚠️",
   error: "❌",
-  system: "🛠️",
+  system: "🧩 ",
 };
 
 // Initialize component collection

@@ -56,9 +56,8 @@ const loadCommands = async () => {
           }
 
           client.commands.set(command.data.name, command);
-          logger.info(
-            `${emoji.success} Loaded command: ${command.data.name}`.green
-          );
+          //logger.info(`${emoji.success} Loaded command: ${command.data.name}`.green);
+          console.log( `${emoji.success} Loaded command: ${command.data.name}`.green)
         } catch (err) {
           logger.error(
             `${emoji.error} Failed to load command at ${filePath}: ${err.message}`
@@ -68,9 +67,8 @@ const loadCommands = async () => {
     }
 
     const count = client.commands.size;
-    logger.info(
-      `${emoji.load} Total commands loaded: ${count} ${count === 0 ? "(⚠️ None loaded!)" : ""}`
-    );
+   // logger.info(`${emoji.load} Total commands loaded: ${count} ${count === 0 ? "(⚠️ None loaded!)" : ""}`);
+    console.log(`${emoji.load} Total commands loaded: ${count} ${count === 0 ? "(⚠️ None loaded!)" : ""}`)
   } catch (err) {
     logger.error(`${emoji.error} Critical error loading commands: ${err.message}`);
     process.exit(1);

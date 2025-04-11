@@ -1,0 +1,14 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Dependency audit logs
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

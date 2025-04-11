@@ -5,7 +5,7 @@ export default {
   name: Events.ClientReady,
   once: true,
   execute(client) {
-    console.log("System".cyan, ">>".blue, `✅ Bot started on ${client.guilds.cache.size} servers.`.green);
+    console.log("🧩System".cyan, ">>".blue, `✅ Bot started on ${client.guilds.cache.size} servers.`.green);
     console.log("Bot".cyan, ">>".blue, `👤 Logged in as ${client.user.tag}`.green);
 
     const defaultStatuses = [
@@ -32,7 +32,7 @@ export default {
           status: "online"
         });
 
-        console.log("Status".cyan, ">>".blue, `🎮 Updated to "${random}"`.green);
+        console.log("✅Status".cyan, ">>".blue, `🎮 Updated to "${random}"`.green);
       } catch (err) {
         console.error("❌ Failed to update presence:", err);
       }
